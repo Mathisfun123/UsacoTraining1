@@ -1,85 +1,70 @@
-import jdk.nashorn.api.tree.Tree;
-
-import java.util.*;
-import java.io.*;
+/*
+ID: sairaja
+LANG: JAVA
+TASK: barn1
+*/
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
 
 public class barn1 {
-// Note Sai: keep beg and endpoints and just keep going based on that
-    public static void main(String args[]) throws IOException {
-        Scanner sc = new Scanner(new File("barn1" + ".in"));
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner sc = new Scanner( new File("barn1.in"));
         PrintWriter out = new PrintWriter(new File("barn1.out"));
-        int m = sc.nextInt();
-        boolean arr [] = new boolean[sc.nextInt()];
-        int lookup = sc.nextInt();
-        sc.nextLine();
-        arr[0]= true;
-        int boardsused = lookup;
-        int minpos = 1; int maxpos = 1;
-        for (int i = 0; i < lookup; i++) {
-            int val = Integer.parseInt(sc.nextLine());
-            arr[val] = true;
-            if(i == 0) {
-                minpos= val;
-            }
-            if(i==lookup-1){
-                maxpos= val;
+        int board = sc.nextInt();
+        int stalls = sc.nextInt(); int filledStalls = sc.nextInt();
+        boolean [] stallsarr =new boolean[stalls+1];
+        int initial = 1;
+        int boardsused = 0;
+
+        for(int i = 0; i< filledStalls; i++){
+            if(i==0){
+                initial= sc.nextInt();
+                stallsarr[initial] =true;
+            }else{
+                stallsarr[sc.nextInt()] = true;
             }
         }
-        // Get info of filled cows: if filled classify spot as true
-        ArrayList<Gaps> Gaplist = new ArrayList<>();
 
-        for(int  i = minpos; i< maxpos; i++){
-            if(!arr[i]){
-                int j = i+1;
-                while(j<maxpos && !arr[j] ){
-                    j++;
+        for (int i = 0; i < stallsarr.length; i++) {
+            boolean b = stallsarr[i];
+            System.out.print(b?1:0);
+        }
+        System.out.println();
+        ArrayList < Gap> gapsremainnig = new ArrayList<>();
+        for(int i = initial; i<= stalls; i++){
+            if(!stallsarr[i]){
+                int origin = i;
+                while(i<stalls && !stallsarr[i]){
+                    i++;
                 }
-                int diff = j - i;
-                Gaplist.add(new Gaps(diff,i,j));
-                i=j;
+                gapsremainnig.add(new Gap(origin,i , i-origin));
+
             }
         }
-        Collections.sort(Gaplist);
-        //identify gaps between stalls
-        for (int i = 0; i < Gaplist.size(); i++) {
-            Gaps gaps =  Gaplist.get(i);
-            System.out.println(gaps);
-        }
-        //keep removing gaps ( smallest distance ) till have max boards possible
-        while(boardsused > m){
-            Gaps item = Gaplist.remove(0);
-            for (int i = item.intialspot; i < item.finalspot; i++) {
-               arr[i] = true;
-            }
-            boardsused--;
-        }
-        int counter = 0;
-        for (int i = minpos; i < maxpos; i++) {
-            if(arr[i]){
-                counter++;
-            }
-        }
-        System.out.println(counter-minpos);
 
+        Collections.sort(gapsremainnig);
+        System.out.println(gapsremainnig);
+        //Start Identifying which gaps need to be covered up 
 
-
+        out.close();
     }
-    static class Gaps implements  Comparable{
-        int gaplength, intialspot, finalspot;
-        public Gaps(int gaplength, int intialspot, int finalspot) {
-            this.gaplength = gaplength;
-            this.intialspot = intialspot;
-            this.finalspot = finalspot;
+    static class Gap implements  Comparable{
+        public int beg,end, distance;
+        public Gap(int a, int b, int c){
+            beg = a; end = b; distance =c;
+        }
+        @Override
+        public int compareTo(Object o) {
+            return this.distance- ((Gap)o).distance;
         }
 
         @Override
-        public int compareTo(Object o) {
-            Gaps p = (Gaps) o;
-            return this.gaplength - p.gaplength;
-        }
-        public String toString(){
-            return gaplength+ " "+ intialspot + " " + finalspot;
+        public String toString() {
+            return beg+ " "+ end+ " " + distance + " ";
         }
     }
 }
-
