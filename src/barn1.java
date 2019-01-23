@@ -17,23 +17,39 @@ public class barn1 {
         int board = sc.nextInt();
         int stalls = sc.nextInt(); int filledStalls = sc.nextInt();
         boolean [] stallsarr =new boolean[stalls+1];
-        int initial = 1;
+        int initial = stalls;
         int boardsused = 0;
 
         for(int i = 0; i< filledStalls; i++){
-            if(i==0){
-                initial= sc.nextInt();
-                stallsarr[initial] =true;
-            }else{
-                stallsarr[sc.nextInt()] = true;
-            }
+
+                int val = sc.nextInt();
+                initial= Math.min(val,initial);
+                stallsarr[val] =true;
+
         }
 
-        for (int i = 0; i < stallsarr.length; i++) {
-            boolean b = stallsarr[i];
-            System.out.print(b?1:0);
+        boolean condition = true;
+        for(int i = initial+1; i< stallsarr.length; i++){
+            if(!condition){
+                if(stallsarr[i]){
+                    condition=true;
+            }
+            }else{
+                if(!stallsarr[i]){
+                    condition= false; boardsused++;
+                }
+            }
         }
-        System.out.println();
+        if(stallsarr[stallsarr.length-1]){
+            boardsused++;
+        }
+
+//        System.out.println(stallsarr[99] + " "+ stallsarr[100] + initial);
+//        for (int i = 0; i < stallsarr.length; i++) {
+//            boolean b = stallsarr[i];
+//            System.out.print(b?1:0);
+//        }
+//        System.out.println();
         ArrayList < Gap> gapsremainnig = new ArrayList<>();
         for(int i = initial; i<= stalls; i++){
             if(!stallsarr[i]){
@@ -46,10 +62,25 @@ public class barn1 {
             }
         }
 
-        Collections.sort(gapsremainnig);
-        System.out.println(gapsremainnig);
-        //Start Identifying which gaps need to be covered up 
 
+        Collections.sort(gapsremainnig);
+//        System.out.println(gapsremainnig);
+        //Start Identifying which gaps need to be covered up
+        while(boardsused>board){
+            Gap item = gapsremainnig.remove(0);
+            for(int i = item.beg; i<=item.end; i++){
+                stallsarr[i]= true;
+            }
+            boardsused--;
+        }
+        int count = 0;
+        for(int i = initial; i< stallsarr.length; i++){
+            if(stallsarr[i]){
+//                System.out.println(i);
+                count++;
+            }
+        }
+        out.println(count);
         out.close();
     }
     static class Gap implements  Comparable{
